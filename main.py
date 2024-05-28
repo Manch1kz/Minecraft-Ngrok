@@ -34,13 +34,13 @@ def main():
     ngrok_listener = setup_ngrok_connection(data['API-KEY'])
     url = ngrok_listener.url().replace("tcp://", "")
 
-    print('+' + '-' * 28 + '+')
+    print('+----------------------------+')
     print('|IP| |' + url + '|')
-    print('+' +'-' * 28 + '+')
+    print('+----------------------------+')
 
     while True:
         pass
     
 if __name__ == "__main__":
-    # system('mode 30,4')
+    system('mode 30,4')
     main()
