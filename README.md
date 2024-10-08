@@ -7,5 +7,5 @@
 
 ## Todo
 1. Refactor the code to make it less coupled
-2. Make an auto-restart
+2. Make an auto-restart (this will be optional setting)
 3. Make an auto-copy to clipboard
