@@ -1,15 +1,24 @@
 from os import system
 import ngrok, struct, socket, json, time
-from threading import Thread
+import asyncio, clipboard
 
-working = True
 ip = None
+
+def create_socket():
+    return socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+def check_connection(host, port):
+    try:
+        socket.socket().connect((host, port))
+        return True
+    except:
+        return False
 
 def search_server():
     multicast_group = '224.0.2.60'
     server_address = ('', 4445)
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock = create_socket()
     sock.bind(server_address)
 
     group = socket.inet_aton(multicast_group)
@@ -32,17 +41,9 @@ def setup_ngrok_connection(apiKey):
     ngrok.set_auth_token(apiKey)
     ngrok_listener = ngrok.forward(ip, 'tcp')
     return ngrok_listener
-
-def check_connection_loop(host, port):
-    global working
-    try:
-        with socket.create_connection((host,port)):
-            working = True
-    except:
-        working = False
             
-def main():
-    global ip, working
+async def main():
+    global ip
     with open('settings.json') as f:
         data = json.load(f)
 
@@ -50,19 +51,26 @@ def main():
     print('|IP| |Loading...             |')
     print('+----------------------------+')
 
-    ngrok_listener = setup_ngrok_connection(data['API-KEY'])
+    ngrok_listener = await setup_ngrok_connection(data['API-KEY'])
     url = ngrok_listener.url().replace("tcp://", "")
-    system('cls')
+    if data['auto-copy']: clipboard.copy(url)
 
     print('+----------------------------+')
     print('|IP| |' + url + '|')
     print('+----------------------------+')
-
+    
+    working = True
     while working:
-        Thread(target=check_connection_loop, args=[ip.split(":")[0], ip.split(":")[1]]).start()
-        time.sleep(1)
+        working = check_connection(ip.split(":")[0], int(ip.split(":")[1]))
+        await asyncio.sleep(1)
+
+    ngrok_listener.close()
+    if data['auto-restart']:
+        asyncio.run(await main())
+    else:
+        exit()
     
 if __name__ == "__main__":
     system('mode 30,4')
     system('cls')
-    main()
+    asyncio.run(main())

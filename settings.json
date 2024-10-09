@@ -1,3 +1,5 @@
 {
-    "API-KEY": "api-token"
+    "API-KEY": "your api-key",
+    "auto-restart": false,
+    "auto-copy": false
 }
