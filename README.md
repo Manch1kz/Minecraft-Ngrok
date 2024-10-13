@@ -6,6 +6,6 @@
 	- If you are on Linux, then just download the repository and run the .py file
 
 ## Todo
-1. Refactor the code to make it less coupled
+1. Refactor the code to make it less coupled ✔
 2. Make an auto-restart ✔
 3. Make an auto-copy to clipboard ✔

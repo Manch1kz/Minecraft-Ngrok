@@ -2,8 +2,6 @@ from os import system
 import ngrok, struct, socket, json, time
 import asyncio, clipboard
 
-ip = None
-
 def create_socket():
     return socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -35,15 +33,12 @@ def search_server():
         data = data.decode("utf-8")
         return f"{address[0]}:{find('AD', data)}"
 
-def setup_ngrok_connection(apiKey):
-    global ip
-    ip = search_server()
+def setup_ngrok_connection(apiKey, ip):
     ngrok.set_auth_token(apiKey)
     ngrok_listener = ngrok.forward(ip, 'tcp')
     return ngrok_listener
             
 async def main():
-    global ip
     with open('settings.json') as f:
         data = json.load(f)
 
@@ -51,7 +46,8 @@ async def main():
     print('|IP| |Loading...             |')
     print('+----------------------------+')
 
-    ngrok_listener = await setup_ngrok_connection(data['API-KEY'])
+    ip = search_server()
+    ngrok_listener = await setup_ngrok_connection(data['API-KEY'], ip)
     url = ngrok_listener.url().replace("tcp://", "")
     if data['auto-copy']: clipboard.copy(url)
 
